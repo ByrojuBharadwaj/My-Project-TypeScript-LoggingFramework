@@ -1,0 +1,17 @@
+{
+  "name": "logging-framework",
+  "version": "1.0.0",
+  "description": "TypeScript logging framework",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "ts-node demo/LoggingDemo.ts",
+    "build": "tsc",
+    "demo": "ts-node demo/LoggingDemo.ts",
+    "demo:async": "ts-node demo/AsyncAppenderDemo.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.39",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.0"
+  }
+}
