@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TypeScript Logging Framework</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #f3efe6;
+        --ink: #1a1f16;
+        --muted: #5a6352;
+        --line: #cfc7b6;
+        --panel: #fffdf8;
+        --accent: #0f6b4c;
+        --accent-ink: #e8fff4;
+        --debug: #3d6b8a;
+        --info: #0f6b4c;
+        --warn: #9a6700;
+        --error: #b42318;
+        --fatal: #7a1020;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: var(--ink);
+        font-family: "Instrument Sans", sans-serif;
+        background:
+          radial-gradient(circle at 12% 18%, rgba(15, 107, 76, 0.12), transparent 36%),
+          radial-gradient(circle at 88% 8%, rgba(61, 107, 138, 0.14), transparent 30%),
+          linear-gradient(160deg, #efe8d8 0%, var(--bg) 45%, #e7efe8 100%);
+      }
+
+      main {
+        width: min(920px, calc(100% - 2rem));
+        margin: 0 auto;
+        padding: 4.5rem 0 3rem;
+      }
+
+      .brand {
+        font-size: clamp(2.4rem, 6vw, 4rem);
+        line-height: 0.95;
+        letter-spacing: -0.04em;
+        margin: 0 0 0.85rem;
+        max-width: 12ch;
+      }
+
+      .lede {
+        margin: 0 0 2.25rem;
+        max-width: 34rem;
+        color: var(--muted);
+        font-size: 1.05rem;
+        line-height: 1.55;
+      }
+
+      .workspace {
+        display: grid;
+        gap: 1rem;
+      }
+
+      form {
+        display: grid;
+        gap: 0.75rem;
+        grid-template-columns: 1fr auto auto;
+        align-items: end;
+      }
+
+      label {
+        display: grid;
+        gap: 0.35rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      input,
+      select,
+      button {
+        font: inherit;
+      }
+
+      input,
+      select {
+        width: 100%;
+        border: 1px solid var(--line);
+        background: var(--panel);
+        color: var(--ink);
+        border-radius: 0.55rem;
+        padding: 0.8rem 0.9rem;
+      }
+
+      button {
+        border: 0;
+        border-radius: 0.55rem;
+        background: var(--accent);
+        color: var(--accent-ink);
+        font-weight: 600;
+        padding: 0.85rem 1.15rem;
+        cursor: pointer;
+        transition: transform 160ms ease, filter 160ms ease;
+      }
+
+      button:hover {
+        filter: brightness(1.05);
+        transform: translateY(-1px);
+      }
+
+      button.secondary {
+        background: transparent;
+        color: var(--accent);
+        border: 1px solid color-mix(in srgb, var(--accent) 45%, white);
+      }
+
+      .actions {
+        display: flex;
+        gap: 0.6rem;
+        flex-wrap: wrap;
+      }
+
+      .terminal {
+        margin-top: 0.5rem;
+        border: 1px solid var(--line);
+        border-radius: 0.85rem;
+        background: #121612;
+        color: #d7e0d3;
+        min-height: 280px;
+        padding: 1rem 1.1rem;
+        overflow: auto;
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.86rem;
+        line-height: 1.55;
+        box-shadow: 0 24px 50px rgba(26, 31, 22, 0.12);
+        animation: rise 500ms ease both;
+      }
+
+      .terminal .empty {
+        color: #7f8a78;
+      }
+
+      .line.debug { color: #8fc4e6; }
+      .line.info { color: #8fdbb8; }
+      .line.warn,
+      .line.warning { color: #f0c674; }
+      .line.error { color: #f2a39a; }
+      .line.fatal { color: #ff8fa3; font-weight: 500; }
+
+      @keyframes rise {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (max-width: 720px) {
+        form {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1 class="brand">TypeScript Logging Framework</h1>
+      <p class="lede">
+        Emit structured logs through appenders and formatters. Try a message
+        below, or run the full level demo against the live API.
+      </p>
+
+      <div class="workspace">
+        <form id="log-form">
+          <label>
+            Message
+            <input
+              id="message"
+              name="message"
+              required
+              placeholder="Payment retry scheduled"
+              value="Payment retry scheduled"
+            />
+          </label>
+          <label>
+            Level
+            <select id="level" name="level">
+              <option value="debug">DEBUG</option>
+              <option value="info" selected>INFO</option>
+              <option value="warn">WARNING</option>
+              <option value="error">ERROR</option>
+              <option value="fatal">FATAL</option>
+            </select>
+          </label>
+          <button type="submit">Log message</button>
+        </form>
+
+        <div class="actions">
+          <button type="button" class="secondary" id="run-demo">Run full demo</button>
+          <button type="button" class="secondary" id="clear">Clear</button>
+        </div>
+
+        <pre class="terminal" id="output" aria-live="polite">
+<span class="empty">Waiting for logs…</span></pre>
+      </div>
+    </main>
+
+    <script>
+      const output = document.getElementById("output");
+      const form = document.getElementById("log-form");
+      const runDemo = document.getElementById("run-demo");
+      const clearBtn = document.getElementById("clear");
+
+      function levelClass(line) {
+        const match = line.match(/\b(DEBUG|INFO|WARNING|ERROR|FATAL)\b/);
+        return match ? match[1].toLowerCase() : "";
+      }
+
+      function render(lines) {
+        if (!lines.length) {
+          output.innerHTML = '<span class="empty">Waiting for logs…</span>';
+          return;
+        }
+        output.innerHTML = lines
+          .map((line) => `<span class="line ${levelClass(line)}">${escapeHtml(line)}</span>`)
+          .join("\n");
+      }
+
+      function escapeHtml(value) {
+        return value
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;");
+      }
+
+      function appendLines(lines) {
+        const existing = [...output.querySelectorAll(".line")].map((el) => el.textContent);
+        const next = existing.concat(lines);
+        render(next);
+      }
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const message = document.getElementById("message").value;
+        const level = document.getElementById("level").value;
+
+        const response = await fetch("/api/log", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message, level, logger: "WebDemo" }),
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          appendLines([`ERROR - ${data.error || "Request failed"}`]);
+          return;
+        }
+        appendLines(data.logs || []);
+      });
+
+      runDemo.addEventListener("click", async () => {
+        const response = await fetch("/api/demo");
+        const data = await response.json();
+        appendLines(data.logs || []);
+      });
+
+      clearBtn.addEventListener("click", () => render([]));
+    </script>
+  </body>
+</html>
